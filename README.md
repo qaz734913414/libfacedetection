@@ -10,20 +10,31 @@ examples/libfacedetectcnn-example.cpp shows how to use the library.
 
 ![Examples](/images/cnnresult.png "Detection example")
 
-## How to Compile
+## How to use the code
 
+You can copy the files in directory src/ into your project, and compile them as the other files in your project. The source code is written in standard C/C++. It should be compiled at any platform which support C/C++.
+
+Some tips:
 * Please add -O3 to turn on optimizations when you compile the source code using g++.
 * Please choose 'Maximize Speed/-O2' when you compile the source code using Microsoft Visual Studio.
+* ENABLE_INT8=ON is recommended for ARM, but it is not recommended for Intel CPU since it cannot gain better speed sometime even worse.
+* The source code can only run in single thread. If you want to run parally, you can call the face detection function in multiple threads. Yes, multiple-thread is complex in programming.
+* If you want to achieve best performance, you can run the model (not the source code) using OpenVINO on Intel CPU or Tengine on ARM CPU.
 
-Create a build folder:
+If you want to compile and run the example, you can create a build folder first, then run the command:
 
 ```
 mkdir build; cd build; rm -rf *
 ```
 
+### Use Tengine to Speedup the detection on ARM
+The model has been added to [Tengine](https://github.com/OAID/Tengine). Tengine, developed by OPEN AI LAB, is a lite, high-performance, and modular inference engine for embedded device. 
+
+The model in Tengine can run faster than the C++ source code here because Tengine has been optimized according to ARM CPU. There are detailed manual and example at Tengine web site: https://github.com/OAID/Tengine/tree/master/examples/YuFaceDetectNet
+
 ### Cross build for aarch64
-1. set cross compiler for aarch64 (please refer to aarch64-toolchain.cmake)
-2. set opencv path since the example code depends on opencv
+1. Set cross compiler for aarch64 (please refer to aarch64-toolchain.cmake)
+2. Set opencv path since the example code depends on opencv
 
 ```
 cmake \
@@ -39,7 +50,6 @@ make
 ### Native build for avx2
 ```
 cmake \
-    -DENABLE_INT8=ON \
     -DENABLE_AVX2=ON \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DDEMO=ON \
@@ -61,9 +71,9 @@ make
 |cnn (CPU, 128x96)   |   2.35ms     | 425.95      |  0.64ms      | 1562.10     |
 
 * OpenCV Haar+AdaBoost runs with minimal face size 48x48
-* Face detection only, and no landmark detection included.
+* Face detection only, and no landmark detection included
 * Minimal face size ~12x12
-* Intel(R) Core(TM) i7-7700 CPU @ 3.6GHz.
+* Intel(R) Core(TM) i7-7700 CPU @ 3.6GHz
 
 ## CNN-based Face Detection on ARM Linux (Raspberry Pi 3 B+)
 
@@ -84,9 +94,12 @@ make
 * Shiqi Yu, <shiqi.yu@gmail.com>
 
 ## Contributors
-* Jia Wu
-* Shengyin Wu
-* Dong Xu
+Some contributors are listed [here](https://github.com/ShiqiYu/libfacedetection/graphs/contributors). 
+
+The contributors who are not listed at GitHub.com:
+* Jia Wu (吴佳)
+* Dong Xu (徐栋)
+* Shengyin Wu (伍圣寅)
 
 ## Acknowledgment
-The work is partly supported by the Science Foundation of Shenzhen (Grant No. JCYJ20150324141711699).
+The work is partly supported by the Science Foundation of Shenzhen (Grant No. JCYJ20150324141711699 and 20170504160426188).
