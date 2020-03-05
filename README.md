@@ -6,7 +6,9 @@ SIMD instructions are used to speed up the detection. You can enable AVX2 if you
 
 The model file has also been provided in directory ./models/.
 
-examples/libfacedetectcnn-example.cpp shows how to use the library.
+examples/detect-image.cpp and examples/detect-camera.cpp show how to use the library.
+
+The library was trained by [libfacedetection.train](https://github.com/ShiqiYu/libfacedetection.train).
 
 ![Examples](/images/cnnresult.png "Detection example")
 
@@ -17,14 +19,12 @@ You can copy the files in directory src/ into your project, and compile them as 
 Some tips:
 * Please add -O3 to turn on optimizations when you compile the source code using g++.
 * Please choose 'Maximize Speed/-O2' when you compile the source code using Microsoft Visual Studio.
-* ENABLE_INT8=ON is recommended for ARM, but it is not recommended for Intel CPU since it cannot gain better speed sometime even worse.
-* The source code can only run in single thread. If you want to run parally, you can call the face detection function in multiple threads. Yes, multiple-thread is complex in programming.
-* If you want to achieve best performance, you can run the model (not the source code) using OpenVINO on Intel CPU or Tengine on ARM CPU.
+* You can enable OpenMP to speedup. But the best solution is to call the detection function in different threads.
 
 If you want to compile and run the example, you can create a build folder first, then run the command:
 
 ```
-mkdir build; cd build; rm -rf *
+mkdir build; cd build; cmake ..; make 
 ```
 
 ### Use Tengine to Speedup the detection on ARM
@@ -38,7 +38,6 @@ The model in Tengine can run faster than the C++ source code here because Tengin
 
 ```
 cmake \
-    -DENABLE_INT8=ON \
     -DENABLE_NEON=ON \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DCMAKE_TOOLCHAIN_FILE=../aarch64-toolchain.cmake \
@@ -65,20 +64,19 @@ make
 |--------------------|--------------|-------------|--------------|-------------|
 |                    |  X64         |X64          |  X64         |X64          |
 |                    |Single-thread |Single-thread|Multi-thread  |Multi-thread |
-|OpenCV Haar+AdaBoost (640x480)|   --         | --          | 12.33ms      |   81.1      |
-|cnn (CPU, 640x480)  |  64.55ms     | 15.49       | 15.78ms      |  63.36      |
-|cnn (CPU, 320x240)  |  15.48ms     | 64.60       |  3.92ms      |  255.01     |
-|cnn (CPU, 160x120)  |   3.86ms     | 259.01      |  1.07ms      |  938.71     |
-|cnn (CPU, 128x96)   |   2.46ms     | 406.33      |  0.68ms      | 1479.79     |
+|cnn (CPU, 640x480)  |  58.03ms     |  17.23      | 13.85ms      |   72.20     |
+|cnn (CPU, 320x240)  |  14.18ms     |  70.51      |  3.38ms      |  296.21     |
+|cnn (CPU, 160x120)  |   3.25ms     | 308.15      |  0.82ms      | 1226.56     |
+|cnn (CPU, 128x96)   |   2.11ms     | 474.38      |  0.52ms      | 1929.60     |
 
-* OpenCV Haar+AdaBoost runs with minimal face size 48x48
-* Face detection only, and no landmark detection included
 * Minimal face size ~10x10
-* Intel(R) Core(TM) i7-7700 CPU @ 3.6GHz
+* Intel(R) Core(TM) i7-1065G7 CPU
 
+<!--
 ## CNN-based Face Detection on ARM Linux (Raspberry Pi 3 B+)
 
-(* to be updated)
+(To be updated)
+
 | Method             |Time          | FPS         |Time          | FPS         |
 |--------------------|--------------|-------------|--------------|-------------|
 |                    |Single-thread |Single-thread|Multi-thread  |Multi-thread |
@@ -90,7 +88,7 @@ make
 * Face detection only, and no landmark detection included.
 * Minimal face size ~10x10
 * Raspberry Pi 3 B+, Broadcom BCM2837B0, Cortex-A53 (ARMv8) 64-bit SoC @ 1.4GHz
-
+-->
 
 ## Author
 * Shiqi Yu, <shiqi.yu@gmail.com>
